@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor Login | Smart Care HMS{% endblock %}
+
+{% block extra_css %}
+<style>
+.doctor-bg {
+  background: url('{% static "images/doctor.jpg" %}') no-repeat center center/cover;
+  min-height: 100vh;
+}
+
+.doctor-login-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5 doctor-bg">
+  <div class="row justify-content-center align-items-center min-vh-75">
+    <div class="col-md-5">
+      <div class="card shadow-lg border-0 p-4 doctor-login-card">
+
+        <h4 class="text-center fw-bold text-primary mb-3">
+          <i class="bi bi-shield-lock-fill"></i> Doctor Access
+        </h4>
+
+        <p class="text-center text-muted small mb-4">
+          Authorized medical staff only
+        </p>
+
+        <form method="POST" action="{% url 'doctor-login' %}">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold small" style="color: #000 !important;">
+              <i class="bi bi-person-fill"></i> Doctor ID / Username
+            </label>
+            <input type="text" name="doctor_id" class="form-control" placeholder="Enter your ID" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold small" style="color: #000 !important;">
+              <i class="bi bi-key-fill"></i> Password
+            </label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 fw-bold py-2 btn-doctor-style">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+          </button>
+        </form>
+
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

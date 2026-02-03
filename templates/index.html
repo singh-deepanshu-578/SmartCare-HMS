@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Smart Care HMS | Home{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero-full">
+    <img src="{% static 'images/doctor.jpg' %}" alt="Hospital" class="hero-bg">
+
+    <div class="tagline-wrapper">
+        <div class="tagline-track">
+            <span>Emergency Comes First • Faster Response • Smarter Care • Saving Lives Without Delay •</span>
+            <span>Emergency Comes First • Faster Response • Smarter Care • Saving Lives Without Delay •</span>
+        </div>
+    </div>
+
+    <div class="hero-content">
+        <h1 class="display-4 fw-bold">
+            AI-Powered <span class="text-primary">Emergency Triage</span>
+        </h1>
+        <p class="lead">Prioritizing critical care when every second matters</p>
+    </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<section class="container mt-5 pt-5">
+    <div class="row align-items-center min-vh-75 py-5">
+
+        <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="display-4 fw-bold text-dark mb-3">
+                AI-Powered <br><span class="text-primary">Emergency Triage</span>
+            </h1>
+            <p class="lead text-muted mb-4">
+                Our system analyzes symptoms instantly to prioritize critical cases,
+                ensuring life-saving care reaches those who need it fastest.
+            </p>
+
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="p-3 border rounded bg-light">
+                        <i class="bi bi-lightning-charge-fill text-warning fs-3"></i>
+                        <h6 class="mt-2">Instant Priority</h6>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 border rounded bg-light">
+                        <i class="bi bi-shield-check text-success fs-3"></i>
+                        <h6 class="mt-2">Live Tracking</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-lg border-0 p-4">
+                <h4 class="mb-3 text-center">Emergency Registration</h4>
+                <p class="text-muted text-center small mb-4">
+                    Fill this for immediate triage and doctor assignment.
+                </p>
+
+                <form id="bookingForm" action="{% url 'patient-register' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Patient Name</label>
+                        <input type="text" name="pName" id="pName" class="form-control" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mobile Number</label>
+                        <input type="tel" name="pPhone" id="pPhone" class="form-control" placeholder="Enter 10-digit mobile" pattern="[0-9]{10}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Location / Address</label>
+                        <input type="text" name="pLocation" id="pLocation" class="form-control" placeholder="Enter your current location" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Current Symptom</label>
+                        <select name="pSymptom" id="pSymptom" class="form-select" required>
+                            <option disabled selected>Select most urgent symptom</option>
+                            <option value="pain">Chest Pain / Breathing Difficulty</option>
+                            <option value="trauma">Severe Physical Injury</option>
+                            <option value="fever">High Fever / Flu</option>
+                            <option value="routine">Routine Checkup</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Care Mode</label>
+                        <select name="careMode" id="careMode" class="form-select">
+                            <option value="hospital">Hospital Emergency</option>
+                            <option value="home">Home Assistance</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                        BOOK EMERGENCY CASE
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Already registered?</small>
+                    <a href="{% url 'patient-login' %}" class="text-primary fw-bold">Login Here</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- SMART EMERGENCY EXTENSIONS -->
+<section class="bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Smart Emergency Extensions</h2>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 p-4 shadow-sm" data-feature="home-care">
+                    <i class="bi bi-house-heart-fill feature-icon text-danger"></i>
+                    <h5 class="fw-bold mt-3">Home Emergency Care</h5>
+                    <p class="small text-muted">
+                        Doctor home visits or instant call assistance for patients unable to reach hospital.
+                    </p>
+                    <a href="{% url 'home-care' %}" class="stretched-link"></a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 p-4 shadow-sm" data-feature="pre-alert">
+                    <i class="bi bi-alarm-fill feature-icon text-warning"></i>
+                    <h5 class="fw-bold mt-3">Pre-Arrival Alerts</h5>
+                    <p class="small text-muted">
+                        Doctors receive alerts before patient arrival for faster preparation.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 p-4 shadow-sm" data-feature="ai-severity">
+                    <i class="bi bi-cpu-fill feature-icon text-primary"></i>
+                    <h5 class="fw-bold mt-3">AI Severity Prediction</h5>
+                    <p class="small text-muted">
+                        Rule-based AI predicts emergency severity and priority.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 p-4 shadow-sm" data-feature="digital-token">
+                    <i class="bi bi-qr-code-scan feature-icon text-success"></i>
+                    <h5 class="fw-bold mt-3">Digital Token</h5>
+                    <p class="small text-muted">
+                        QR-based digital emergency token for fast identification.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 p-4 shadow-sm" data-feature="family-dashboard">
+                    <i class="bi bi-people-fill feature-icon text-info"></i>
+                    <h5 class="fw-bold mt-3">Family Dashboard</h5>
+                    <p class="small text-muted">
+                        Family members can track treatment and doctor assignment.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 p-4 shadow-sm" data-feature="instructions">
+                    <i class="bi bi-info-circle-fill feature-icon text-secondary"></i>
+                    <h5 class="fw-bold mt-3">Emergency Instructions</h5>
+                    <p class="small text-muted">
+                        First-aid guidance while waiting for medical help.
+                    </p>
+                    <a href="{% url 'patient-login' %}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOSPITAL NETWORK -->
+<section class="bg-light py-5">
+    <div class="container">
+
+        <h2 class="text-center mb-4">Hospital Network Status</h2>
+
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <input type="text" id="hospitalSearch" class="form-control"
+                       placeholder="Search hospital (AIIMS, Safdarjung, Max)"
+                       onkeyup="filterHospitals()">
+            </div>
+        </div>
+
+        <div class="row g-4" id="hospitalList">
+            {% for hospital in hospitals %}
+            <div class="col-md-4 hospital-card">
+                <div class="card h-100 shadow-sm border-0">
+                    {% if hospital.image %}
+                    <img src="{{ hospital.image.url }}" class="card-img-top" alt="{{ hospital.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <img src="{% static 'images/hospital-default.jpg' %}" class="card-img-top" alt="{{ hospital.name }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5>{{ hospital.name }}</h5>
+                        <p class="small">Emergency Load: <strong>{{ hospital.get_emergency_load_display }}</strong></p>
+                        {% if hospital.emergency_load == 'very_high' %}
+                        <span class="badge bg-danger">Overloaded</span>
+                        {% elif hospital.emergency_load == 'high' %}
+                        <span class="badge bg-warning text-dark">Busy</span>
+                        {% else %}
+                        <span class="badge bg-success">Available</span>
+                        {% endif %}
+                        <p class="small mt-2 text-muted">
+                            Beds: {{ hospital.available_beds }}/{{ hospital.total_beds }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No hospitals registered yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterHospitals() {
+    const value = document.getElementById("hospitalSearch").value.toLowerCase();
+    document.querySelectorAll(".hospital-card").forEach(card => {
+        card.style.display = card.innerText.toLowerCase().includes(value)
+            ? "block" : "none";
+    });
+}
+</script>
+{% endblock %}

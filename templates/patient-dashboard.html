@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Patient Dashboard | Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+  <!-- Patient Info Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h3 class="mb-2">
+        <i class="bi bi-person-circle text-primary"></i> 
+        Welcome, {{ patient.name }}
+      </h3>
+      <p class="text-muted mb-0">
+        <i class="bi bi-phone"></i> {{ patient.phone }} | 
+        {% if patient.location %}
+        <i class="bi bi-geo-alt"></i> {{ patient.location }}
+        {% endif %}
+      </p>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <div class="card bg-light p-3">
+        <div class="row text-center">
+          <div class="col-6">
+            <h4 class="mb-0 text-primary">{{ total_cases }}</h4>
+            <small class="text-muted">Total Cases</small>
+          </div>
+          <div class="col-6">
+            <h4 class="mb-0 text-success">{{ total_appointments }}</h4>
+            <small class="text-muted">Appointments</small>
+          </div>
+        </div>
+      </div>
+      <div class="mt-2">
+        <a href="{% url 'patient-change-password' %}" class="btn btn-outline-secondary btn-sm w-100">
+          <i class="bi bi-key"></i> Change Password
+        </a>
+        <a href="{% url 'patient-logout' %}" class="btn btn-outline-danger btn-sm w-100 mt-2">
+          <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <a href="{% url 'patient' %}" class="card text-decoration-none hover-card">
+        <div class="card-body d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill text-danger fs-1 me-3"></i>
+          <div>
+            <h5 class="mb-0">Book Emergency</h5>
+            <small class="text-muted">Urgent medical assistance</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <a href="{% url 'appointment' %}" class="card text-decoration-none hover-card">
+        <div class="card-body d-flex align-items-center">
+          <i class="bi bi-calendar-check-fill text-primary fs-1 me-3"></i>
+          <div>
+            <h5 class="mb-0">Schedule Appointment</h5>
+            <small class="text-muted">Book a doctor visit</small>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabs for Cases and Appointments -->
+  <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button">
+        <i class="bi bi-clock"></i> Upcoming
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="inprogress-tab" data-bs-toggle="tab" data-bs-target="#inprogress" type="button">
+        <i class="bi bi-play-circle"></i> In Progress
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button">
+        <i class="bi bi-check-circle"></i> Completed
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button">
+        <i class="bi bi-list"></i> All
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="myTabContent">
+    <!-- Upcoming Tab -->
+    <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+      <h5 class="mb-3">Upcoming Emergency Cases</h5>
+      {% if upcoming_cases %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Token</th>
+              <th>Symptom</th>
+              <th>Priority</th>
+              <th>Doctor</th>
+              <th>Hospital</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in upcoming_cases %}
+            <tr>
+              <td><strong>{{ case.token }}</strong></td>
+              <td>{{ case.get_symptom_display }}</td>
+              <td>
+                <span class="badge bg-{% if case.priority == 'Critical' %}danger{% elif case.priority == 'High' %}warning text-dark{% elif case.priority == 'Medium' %}info{% else %}success{% endif %}">
+                  {{ case.priority }}
+                </span>
+              </td>
+              <td>
+                {% if case.assigned_doctor %}
+                  {{ case.assigned_doctor.name }}
+                {% else %}
+                  <span class="text-muted">Assigning...</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if case.assigned_hospital %}
+                  {{ case.assigned_hospital.name }}
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-{% if case.status == 'Waiting' %}secondary{% elif case.status == 'Doctor Assigned' %}primary{% elif case.status == 'In Progress' %}info{% else %}warning{% endif %}">
+                  {{ case.status }}
+                </span>
+              </td>
+              <td>{{ case.created_at|date:"M d, Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No upcoming emergency cases
+      </div>
+      {% endif %}
+
+      <h5 class="mb-3 mt-4">Upcoming Appointments</h5>
+      {% if upcoming_appointments %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Doctor</th>
+              <th>Hospital</th>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in upcoming_appointments %}
+            <tr>
+              <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+              <td>{{ appt.appointment_time|time:"H:i" }}</td>
+              <td>{{ appt.doctor.name }}</td>
+              <td>
+                {% if appt.hospital %}
+                  {{ appt.hospital.name }}
+                {% else %}
+                  <span class="text-muted">TBD</span>
+                {% endif %}
+              </td>
+              <td>{{ appt.reason }}</td>
+              <td>
+                <span class="badge bg-{% if appt.status == 'Scheduled' %}info{% elif appt.status == 'Confirmed' %}success{% else %}secondary{% endif %}">
+                  {{ appt.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No upcoming appointments
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- In Progress Tab -->
+    <div class="tab-pane fade" id="inprogress" role="tabpanel">
+      <h5 class="mb-3">Cases In Progress</h5>
+      {% if upcoming_cases %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Token</th>
+              <th>Symptom</th>
+              <th>Doctor</th>
+              <th>Status</th>
+              <th>ETA</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in upcoming_cases %}
+            {% if case.status == 'In Progress' or case.status == 'Doctor En Route' %}
+            <tr>
+              <td><strong>{{ case.token }}</strong></td>
+              <td>{{ case.get_symptom_display }}</td>
+              <td>{{ case.assigned_doctor.name }}</td>
+              <td>
+                <span class="badge bg-info">{{ case.status }}</span>
+              </td>
+              <td>{{ case.eta|default:"Calculating..." }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No cases in progress
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Completed Tab -->
+    <div class="tab-pane fade" id="completed" role="tabpanel">
+      <h5 class="mb-3">Completed Cases</h5>
+      {% if past_cases %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Token</th>
+              <th>Symptom</th>
+              <th>Doctor</th>
+              <th>Hospital</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in past_cases %}
+            <tr>
+              <td><strong>{{ case.token }}</strong></td>
+              <td>{{ case.get_symptom_display }}</td>
+              <td>{{ case.assigned_doctor.name }}</td>
+              <td>
+                {% if case.assigned_hospital %}
+                  {{ case.assigned_hospital.name }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-{% if case.status == 'Completed' %}success{% else %}secondary{% endif %}">
+                  {{ case.status }}
+                </span>
+              </td>
+              <td>{{ case.created_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No completed cases
+      </div>
+      {% endif %}
+
+      <h5 class="mb-3 mt-4">Past Appointments</h5>
+      {% if past_appointments %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Doctor</th>
+              <th>Hospital</th>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in past_appointments %}
+            <tr>
+              <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+              <td>{{ appt.doctor.name }}</td>
+              <td>
+                {% if appt.hospital %}
+                  {{ appt.hospital.name }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ appt.reason }}</td>
+              <td>
+                <span class="badge bg-{% if appt.status == 'Completed' %}success{% else %}secondary{% endif %}">
+                  {{ appt.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No past appointments
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- All Tab -->
+    <div class="tab-pane fade" id="all" role="tabpanel">
+      <h5 class="mb-3">All Emergency Cases</h5>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Token</th>
+              <th>Symptom</th>
+              <th>Priority</th>
+              <th>Doctor</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for case in upcoming_cases %}
+            <tr>
+              <td><strong>{{ case.token }}</strong></td>
+              <td>{{ case.get_symptom_display }}</td>
+              <td>
+                <span class="badge bg-{% if case.priority == 'Critical' %}danger{% elif case.priority == 'High' %}warning text-dark{% elif case.priority == 'Medium' %}info{% else %}success{% endif %}">
+                  {{ case.priority }}
+                </span>
+              </td>
+              <td>
+                {% if case.assigned_doctor %}
+                  {{ case.assigned_doctor.name }}
+                {% else %}
+                  Pending
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ case.status }}</span>
+              </td>
+              <td>{{ case.created_at|date:"M d, Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+            {% for case in past_cases %}
+            <tr>
+              <td><strong>{{ case.token }}</strong></td>
+              <td>{{ case.get_symptom_display }}</td>
+              <td>
+                <span class="badge bg-{% if case.priority == 'Critical' %}danger{% elif case.priority == 'High' %}warning text-dark{% elif case.priority == 'Medium' %}info{% else %}success{% endif %}">
+                  {{ case.priority }}
+                </span>
+              </td>
+              <td>{{ case.assigned_doctor.name }}</td>
+              <td>
+                <span class="badge bg-success">{{ case.status }}</span>
+              </td>
+              <td>{{ case.created_at|date:"M d, Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <h5 class="mb-3 mt-4">All Appointments</h5>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Doctor</th>
+              <th>Hospital</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in upcoming_appointments %}
+            <tr>
+              <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+              <td>{{ appt.appointment_time|time:"H:i" }}</td>
+              <td>{{ appt.doctor.name }}</td>
+              <td>
+                {% if appt.hospital %}
+                  {{ appt.hospital.name }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-primary">{{ appt.status }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+            {% for appt in past_appointments %}
+            <tr>
+              <td>{{ appt.appointment_date|date:"M d, Y" }}</td>
+              <td>{{ appt.appointment_time|time:"H:i" }}</td>
+              <td>{{ appt.doctor.name }}</td>
+              <td>
+                {% if appt.hospital %}
+                  {{ appt.hospital.name }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-success">{{ appt.status }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.hover-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor On The Way | Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <div class="card shadow-lg p-4">
+    <h4 class="fw-bold text-success">
+      <i class="bi bi-geo-alt-fill"></i> Doctor En Route
+    </h4>
+
+    {% if case %}
+    <div class="row mt-3">
+      <div class="col-md-3"><strong>Token:</strong> <code>{{ case.token }}</code></div>
+      <div class="col-md-3"><strong>Patient:</strong> {{ case.patient_name }}</div>
+      <div class="col-md-3"><strong>ETA:</strong> {{ case.eta|default:"8-10 minutes" }}</div>
+      <div class="col-md-3"><strong>Status:</strong> <span class="badge bg-warning">{{ case.status }}</span></div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-4">
+        <strong>Doctor:</strong> 
+        {% if case.assigned_doctor %}
+          {{ case.assigned_doctor.name }}
+        {% else %}
+          <span class="text-muted">Assigning...</span>
+        {% endif %}
+      </div>
+      <div class="col-md-4"><strong>Mode:</strong> {{ case.mode }}</div>
+      <div class="col-md-4"><strong>Priority:</strong> <span class="badge bg-danger">{{ case.priority }}</span></div>
+    </div>
+    {% else %}
+    <div class="row mt-3">
+      <div class="col-md-4"><strong>Doctor:</strong> Dr. Sharma</div>
+      <div class="col-md-4"><strong>ETA:</strong> 8–10 minutes</div>
+      <div class="col-md-4"><strong>Status:</strong> <span class="badge bg-warning">On the way</span></div>
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+      <a href="tel:108" class="btn btn-outline-primary btn-sm me-2">
+        <i class="bi bi-telephone-fill"></i> Call Doctor
+      </a>
+      <a href="tel:108" class="btn btn-outline-secondary btn-sm me-2">
+        <i class="bi bi-chat-dots-fill"></i> Message
+      </a>
+      <a href="{% url 'patient' %}" class="btn btn-outline-success btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to Portal
+      </a>
+    </div>
+  </div>
+  
+  <!-- Live Tracking Map Placeholder -->
+  <div class="card shadow-sm mt-4">
+    <div class="card-header bg-white">
+      <h5 class="mb-0"><i class="bi bi-map"></i> Live Location</h5>
+    </div>
+    <div class="card-body">
+      <div class="bg-light rounded" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+        <div class="text-center text-muted">
+          <i class="bi bi-geo-alt fs-1"></i>
+          <p class="mb-0">Doctor is 2.5 km away</p>
+          <small>Arriving in approximately {{ case.eta|default:"8-10 minutes" }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

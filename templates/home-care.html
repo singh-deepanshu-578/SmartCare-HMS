@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home Emergency Care | Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+
+      <div class="card shadow-lg p-4">
+        <h4 class="text-danger fw-bold text-center mb-3">
+          <i class="bi bi-house-heart-fill"></i> Home Emergency Care
+        </h4>
+
+        <p class="text-center text-muted mb-4">
+          Request immediate medical assistance at your home
+        </p>
+
+        <form id="homeCareForm" method="POST" action="{% url 'home-care' %}">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold">Patient Name</label>
+            <input type="text" name="hcName" id="hcName" class="form-control" placeholder="Enter patient name" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Mobile Number</label>
+            <input type="tel" name="hcPhone" id="hcPhone" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+            <small class="text-muted">This will be your login ID</small>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold">Full Address</label>
+            <textarea name="hcAddress" id="hcAddress" class="form-control" rows="3" placeholder="Enter complete address with landmarks" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Emergency Type</label>
+            <select name="hcIssue" id="hcIssue" class="form-select" required>
+              <option value="">Select Emergency</option>
+              <option value="Heart Attack Symptoms">Heart Attack Symptoms</option>
+              <option value="Breathing Difficulty">Breathing Difficulty</option>
+              <option value="Stroke Symptoms">Stroke Symptoms</option>
+              <option value="Severe Weakness">Severe Weakness</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">Service Type</label>
+            <select name="hcMode" id="hcMode" class="form-select">
+              <option value="Doctor Home Visit">Doctor Home Visit</option>
+              <option value="Doctor On Call Assistance">Doctor On Call Assistance</option>
+            </select>
+            <small class="text-muted">
+              <i class="bi bi-info-circle"></i> 
+              Home Visit: Doctor will come to your location | 
+              On Call: Telephonic consultation
+            </small>
+          </div>
+
+          <button type="submit" class="btn btn-danger w-100 fw-bold py-3">
+            <i class="bi bi-hospital"></i> REQUEST IMMEDIATE HELP
+          </button>
+        </form>
+
+        <div class="text-center mt-3">
+          <small class="text-muted">Already registered?</small>
+          <a href="{% url 'patient-login' %}" class="text-primary fw-bold">Login Here</a>
+        </div>
+      </div>
+
+      <div class="alert alert-warning mt-3">
+        <strong><i class="bi bi-exclamation-triangle"></i> For Life-Threatening Emergencies:</strong><br>
+        Call Emergency Helpline: <a href="tel:108" class="alert-link fw-bold">108</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

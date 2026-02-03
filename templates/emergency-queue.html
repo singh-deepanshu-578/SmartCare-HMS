@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Emergency Priority Queue | Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h3 class="fw-bold mb-3">
+        <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+        Emergency Priority Queue
+      </h3>
+      <p class="text-muted mb-0">
+        Patients are listed in real-time based on emergency severity and priority score.
+      </p>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <div class="card bg-light p-3">
+        <div class="row text-center">
+          <div class="col-4">
+            <h4 class="mb-0">{{ total_waiting }}</h4>
+            <small class="text-muted">Waiting</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-danger">{{ critical_count }}</h4>
+            <small class="text-danger">Critical</small>
+          </div>
+          <div class="col-4">
+            <h4 class="mb-0 text-warning">{{ high_count }}</h4>
+            <small class="text-warning">High</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Queue No.</th>
+          <th>Token</th>
+          <th>Name</th>
+          <th>Emergency Type</th>
+          <th>Priority</th>
+          <th>Mode</th>
+          <th>Doctor</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="queueTable">
+        {% for case in cases %}
+        <tr class="{% if case.priority == 'Critical' %}table-danger{% elif case.priority == 'High' %}table-warning{% elif case.priority == 'Medium' %}table-info{% else %}table-success{% endif %}">
+          <td><strong>{{ forloop.counter }}</strong></td>
+          <td><code>{{ case.token }}</code></td>
+          <td>{{ case.patient_name }}</td>
+          <td>{{ case.get_symptom_display }}</td>
+          <td>
+            <span class="badge bg-{% if case.priority == 'Critical' %}danger{% elif case.priority == 'High' %}warning text-dark{% elif case.priority == 'Medium' %}info{% else %}success{% endif %}">
+              {{ case.priority }}
+            </span>
+          </td>
+          <td>{{ case.mode }}</td>
+          <td>{% if case.assigned_doctor %}{{ case.assigned_doctor.name }}{% else %}<span class="text-muted">-</span>{% endif %}</td>
+          <td>
+            <span class="badge bg-{% if case.status == 'Waiting' %}secondary{% elif case.status == 'Doctor Assigned' %}primary{% elif case.status == 'In Progress' %}info{% elif case.status == 'Doctor En Route' %}warning{% else %}success{% endif %}">
+              {{ case.status }}
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1"></i>
+            <p class="mb-0">No active emergency cases.</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer class="bg-light py-3 mt-5">
+  <div class="container text-center small text-muted">
+    © 2026 Smart Care HMS
+  </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-refresh queue every 30 seconds
+setInterval(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doctor Dashboard | Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-4">
+  <!-- Doctor Info Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h3 class="mb-2">
+        <i class="bi bi-person-badge-fill text-primary"></i> 
+        Welcome, Dr. {{ doctor.name }}
+      </h3>
+      <p class="text-muted mb-0">
+        {{ doctor.get_specialization_display }} | 
+        <span class="badge bg-{% if doctor.status == 'available' %}success{% elif doctor.status == 'busy' %}warning{% else %}secondary{% endif %}">
+          {{ doctor.get_status_display }}
+        </span>
+      </p>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <div class="card bg-light p-3">
+        <div class="row text-center">
+          <div class="col-6">
+            <h4 class="mb-0">{{ total_cases }}</h4>
+            <small class="text-muted">Total Cases</small>
+          </div>
+          <div class="col-6">
+            <h4 class="mb-0">{{ pending_cases }}</h4>
+            <small class="text-muted">Pending</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assigned Cases -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">
+        <i class="bi bi-clipboard-pulse"></i> My Assigned Cases
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-bordered mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Token</th>
+              <th>Patient</th>
+              <th>Issue</th>
+              <th>Mode</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="docPatients">
+            {% for case in cases %}
+            <tr class="{% if case.priority == 'Critical' %}table-danger{% elif case.priority == 'High' %}table-warning{% elif case.priority == 'Medium' %}table-info{% else %}table-success{% endif %}">
+              <td><strong>{{ case.token }}</strong></td>
+              <td>{{ case.patient_name }}</td>
+              <td>{{ case.get_symptom_display }}</td>
+              <td>{{ case.mode }}</td>
+              <td>
+                <span class="badge bg-{% if case.priority == 'Critical' %}danger{% elif case.priority == 'High' %}warning text-dark{% elif case.priority == 'Medium' %}info{% else %}success{% endif %}">
+                  {{ case.priority }}
+                </span>
+              </td>
+              <td>{{ case.status }}</td>
+              <td>
+                <form method="POST" action="{% url 'update-case' case.id %}" class="d-inline">
+                  {% csrf_token %}
+                  <select name="status" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                    <option value="{{ case.status }}" selected>{{ case.status }}</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Doctor En Route">Doctor En Route</option>
+                  </select>
+                </form>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1"></i>
+                <p class="mb-0">No cases assigned yet.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Appointments -->
+  {% if appointments %}
+  <div class="card shadow-sm">
+    <div class="card-header bg-white">
+      <h5 class="mb-0">
+        <i class="bi bi-calendar-check"></i> Today's Appointments
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Time</th>
+              <th>Patient</th>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in appointments %}
+            <tr>
+              <td>{{ appt.appointment_time|time:"H:i" }}</td>
+              <td>{{ appt.patient_name }}</td>
+              <td>{{ appt.reason }}</td>
+              <td>
+                <span class="badge bg-{% if appt.status == 'Scheduled' %}info{% elif appt.status == 'Confirmed' %}primary{% elif appt.status == 'Completed' %}success{% else %}secondary{% endif %}">
+                  {{ appt.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% load static %}
+
+{% block title %}Emergency Registration | Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container py-3 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 p-4">
+                <h3 class="text-center mb-3">Emergency Registration</h3>
+                <p class="text-muted text-center small mb-4">
+                    Fill this for immediate triage and doctor assignment.
+                </p>
+
+                <form id="bookingForm" action="{% url 'patient-register' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Patient Name</label>
+                        <input type="text" name="pName" id="pName" class="form-control" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mobile Number</label>
+                        <input type="tel" name="pPhone" id="pPhone" class="form-control" placeholder="Enter 10-digit mobile" pattern="[0-9]{10}" required>
+                        <small class="text-muted">This will be your login ID</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Location / Address</label>
+                        <input type="text" name="pLocation" id="pLocation" class="form-control" placeholder="Enter your current location" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Current Symptom</label>
+                        <select name="pSymptom" id="pSymptom" class="form-select" required>
+                            <option disabled selected>Select most urgent symptom</option>
+                            <option value="pain">Chest Pain / Breathing Difficulty</option>
+                            <option value="trauma">Severe Physical Injury</option>
+                            <option value="fever">High Fever / Flu</option>
+                            <option value="routine">Routine Checkup</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Care Mode</label>
+                        <select name="careMode" id="careMode" class="form-select">
+                            <option value="hospital">Hospital Emergency</option>
+                            <option value="home">Home Assistance</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                        BOOK EMERGENCY CASE
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Already registered?</small>
+                    <a href="{% url 'patient-login' %}" class="text-primary fw-bold">Login Here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 p-4">
+                <h3 class="text-center mb-3">Emergency Registration</h3>
+                <p class="text-muted text-center small mb-4">
+                    Fill this for immediate triage and doctor assignment.
+                </p>
+
+                <form id="bookingForm" action="{% url 'patient-register' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Patient Name</label>
+                        <input type="text" name="pName" id="pName" class="form-control" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Mobile Number</label>
+                        <input type="tel" name="pPhone" id="pPhone" class="form-control" placeholder="Enter 10-digit mobile" pattern="[0-9]{10}" required>
+                        <small class="text-muted">This will be your login ID</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Location / Address</label>
+                        <input type="text" name="pLocation" id="pLocation" class="form-control" placeholder="Enter your current location" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Current Symptom</label>
+                        <select name="pSymptom" id="pSymptom" class="form-select" required>
+                            <option disabled selected>Select most urgent symptom</option>
+                            <option value="pain">Chest Pain / Breathing Difficulty</option>
+                            <option value="trauma">Severe Physical Injury</option>
+                            <option value="fever">High Fever / Flu</option>
+                            <option value="routine">Routine Checkup</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Care Mode</label>
+                        <select name="careMode" id="careMode" class="form-select">
+                            <option value="hospital">Hospital Emergency</option>
+                            <option value="home">Home Assistance</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                        BOOK EMERGENCY CASE
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Already registered?</small>
+                    <a href="{% url 'patient-login' %}" class="text-primary fw-bold">Login Here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const instructions = {
+  pain: [
+    "Make patient sit or lie comfortably",
+    "Loosen tight clothing",
+    "Do not give food or water",
+    "Monitor breathing continuously"
+  ],
+  trauma: [
+    "Do not move patient unnecessarily",
+    "Apply pressure to stop bleeding",
+    "Keep patient warm"
+  ],
+  burn: [
+    "Cool burn with running water",
+    "Do not apply ointments",
+    "Cover with clean cloth"
+  ],
+  fever: [
+    "Keep patient hydrated",
+    "Monitor temperature",
+    "Avoid heavy clothing"
+  ]
+};
+
+document.getElementById("pSymptom").addEventListener("change", function() {
+  const type = this.value;
+  const list = document.getElementById("instructionList");
+  list.innerHTML = "";
+  if (instructions[type]) {
+    instructions[type].forEach(i => list.innerHTML += `<li>${i}</li>`);
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Appointment - Smart Care HMS{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <div>
+                    <strong>Note:</strong> For urgent symptoms like chest pain or trauma, please use the 
+                    <a href="{% url 'index' %}" class="alert-link">Emergency Triage</a> on the home page.
+                </div>
+            </div>
+
+            <div class="card shadow-sm p-4">
+                <h2 class="mb-4">Schedule an Appointment</h2>
+                <form id="bookingForm" method="POST" action="{% url 'appointment-book' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Patient Full Name</label>
+                        <input type="text" name="pName" id="pName" class="form-control" placeholder="Enter your name" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" name="pPhone" id="pPhone" class="form-control" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+                            <small class="text-muted">This will be your login ID</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Location / Address</label>
+                            <input type="text" name="pLocation" id="pLocation" class="form-control" placeholder="Your location" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Preferred Doctor</label>
+                        <select name="pDoctor" id="pDoctor" class="form-select" required>
+                            <option value="">Select Doctor</option>
+                            {% for doc in doctors %}
+                            <option value="{{ doc.id }}">{{ doc.name }} ({{ doc.get_specialization_display }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Preferred Hospital (Optional)</label>
+                        <select name="pHospital" id="pHospital" class="form-select">
+                            <option value="">Any Available Hospital</option>
+                            {% for hospital in hospitals %}
+                            <option value="{{ hospital.id }}">{{ hospital.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Symptom / Reason for Visit</label>
+                        <select name="pSymptom" id="pSymptom" class="form-select">
+                            <option value="routine">Routine Checkup</option>
+                            <option value="fever">Fever / Flu Symptoms</option>
+                            <option value="pain">Physical Pain</option>
+                            <option value="followup">Follow-up Consultation</option>
+                            <option value="test">Test Results Discussion</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Preferred Date</label>
+                            <input type="date" name="appointment_date" id="appointment_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Preferred Time</label>
+                            <input type="time" name="appointment_time" id="appointment_time" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <small><i class="bi bi-info-circle"></i> System checks for time slot availability automatically</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Confirm Booking</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Already have an account?</small>
+                    <a href="{% url 'patient-login' %}" class="text-primary fw-bold">Login to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('appointment_date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+});
+</script>
+{% endblock %}
