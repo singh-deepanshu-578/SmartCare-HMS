@@ -21,12 +21,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY SETTINGS
 # ===============================
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure--_5g*4jot1$%$p4resafe!$^@v2h-5)rn)vgyjd&#%2t1r5qgh"
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "local-development-secret-key-change-this-before-production",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes"}
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1"
+    ).split(",")
+    if host.strip()
+]
+if DEBUG:
+    ALLOWED_HOSTS.append("*")
 
 
 # ===============================
@@ -41,11 +52,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "whitenoise.runserver_nostatic",
     'hmsapp',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -88,21 +101,20 @@ WSGI_APPLICATION = "hms.wsgi.application"
 # ===============================
 # DATABASE CONFIGURATION
 # ===============================
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    import dj_database_url
+
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
-    # For PostgreSQL (production):
-    # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": "hms_db",
-    #     "USER": "hms_user",
-    #     "PASSWORD": "your_password",
-    #     "HOST": "localhost",
-    #     "PORT": "5432",
-    # }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # ===============================
@@ -146,6 +158,7 @@ STATICFILES_DIRS = [
 
 # Directory where static files will be collected during deployment
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # ===============================
@@ -153,6 +166,21 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # ===============================
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # ===============================
